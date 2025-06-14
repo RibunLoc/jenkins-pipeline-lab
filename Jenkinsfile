@@ -25,7 +25,8 @@ pipeline
         stage('Check services') {
             steps {
                 script {
-                    def changedFiles = sh(script: "git diff --name-only $GIT_PREVIOUS_COMMIT $GIT_COMMIT", returnStdout: true).trim().split("\n")
+                    sh 'git fetch origin main'
+                    def changedFiles = sh(script: "git diff --name-only origin/main", returnStdout: true).trim().split("\n")
                     def detectServices = ""
                     
                     if (changedFiles.any { it.startsWith("user-service/auth/")}) {
