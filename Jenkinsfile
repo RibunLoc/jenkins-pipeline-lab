@@ -150,7 +150,7 @@ pipeline
                     ]) {
                     sh """
                         # Tạo confiMap Secret
-                        kubectl create configmap ${SERVICES}-env --from-env-file=\$ENV_FILE -o yaml --dry-run=client | kubectl appy -f -
+                        kubectl create configmap ${SERVICES}-env --from-env-file=\$ENV_FILE -o yaml --dry-run=client | kubectl apply -f -
                         # triển khai dịch vụ
                         kubectl apply -f k8s/${SERVICES}-deployment.yaml
                     """
