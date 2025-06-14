@@ -25,8 +25,9 @@ pipeline
         stage('Check services') {
             steps {
                 script {
-                    sh 'git fetch origin main'
-                    def changedFiles = sh(script: "git diff --name-only origin/main", returnStdout: true).trim().split("\n")
+                    def prevCommit = sh(script: "git rev-parse HEAD~1", returnStdout: true).trim()
+                    def currCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    def changedFiles = sh(script: "git diff --name-only ${prevCommit} ${currCommit}", returnStdout: true).trim().split("\n")
                     def detectServices = ""
                     
                     if (changedFiles.any { it.startsWith("user-service/auth/")}) {
@@ -150,6 +151,7 @@ pipeline
                         [$class: 'FileBinding', credentialsId: 'MYSQL-DOTENV', variable: 'ENV_FILE']
                     ]) {
                     sh """
+                        aws eks --region us-east-1 update-kubeconfig --name Task-Management-Cluster
                         # Tạo confiMap Secret
                         kubectl create configmap ${SERVICES}-env --from-env-file=\$ENV_FILE -o yaml --dry-run=client | kubectl apply -f -
                         # triển khai dịch vụ
